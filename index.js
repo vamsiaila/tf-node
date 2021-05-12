@@ -68,11 +68,12 @@ class AI {
                     errors.dogs.push(dogFiles[i - 1]);
                 }
             }
-            // const y = tf.oneHot(labels, 2);
-            const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
+            const ys = tf.oneHot(labels, 2);
+            // const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
 
             await model.fit(tf.stack(images), ys, {
-                epochs: 2
+                epochs: 4,
+                validationSplit: 0.2
             })
         } catch (error) {
             console.log(error);
