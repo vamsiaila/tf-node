@@ -8,30 +8,28 @@ const sharp = require('sharp');
 class AI {
     compile() {
         const model = tf.sequential();
-
         //input layer
         model.add(tf.layers.conv2d({
-            inputShape: [250, 250, 3],
-            kernelSize: 5,
-            filters: 8,
-            strides: 1,
+            inputShape: [28, 28, 3],
+            kernelSize: [3,3],
+            filters: 32,
             activation: 'relu',
-            kernelInitializer: 'varianceScaling'
+            kernelInitializer: 'VarianceScaling'
         }));
 
-        model.add(tf.layers.maxPooling2d({poolSize: [2, 2], strides: [2, 2]}));
+
+        model.add(tf.layers.maxPooling2d({poolSize: [2, 2]}));
 
         model.add(tf.layers.flatten());
 
         model.add(tf.layers.dense({
             units: 2,
-            kernelInitializer: 'varianceScaling',
             activation: 'softmax'
         }));
 
         model.compile({
             loss: 'categoricalCrossentropy',
-            optimizer: tf.train.adam(),
+            optimizer: 'Adam',
             metrics: ['accuracy'],
         });
         return model;
@@ -42,8 +40,8 @@ class AI {
         try {
             const model = this.compile();
 
-            const catTensors = [];
-            const dogTensors = [];
+            const images = [];
+            const labels = [];
 
             const catFiles = await readDir(`${__dirname}/data/Cat/`);
             const dogFiles = await readDir(`${__dirname}/data/Dog/`);
@@ -53,8 +51,9 @@ class AI {
             for (let i = j; i > 0; i--) {
                 try {
                     const image = await readFile(`${__dirname}/data/Cat/${catFiles[i - 1]}`);
-                    const resizedBuffer = await sharp(image).resize(250, 250).toBuffer();
-                    catTensors.push(tf.node.decodeJpeg(resizedBuffer));
+                    const resizedBuffer = await sharp(image).resize(28, 28).toBuffer();
+                    images.push(tf.node.decodeJpeg(resizedBuffer, 3));
+                    labels.push(0);
                 } catch (error) {
                     errors.cats.push(catFiles[i - 1]);
                 }
@@ -62,20 +61,19 @@ class AI {
             for (let i = k; i > 0; i--) {
                 try {
                     const image = await readFile(`${__dirname}/data/Dog/${dogFiles[i - 1]}`);
-                    const resizedBuffer = await sharp(image).resize(250, 250).toBuffer();
-                    dogTensors.push(tf.node.decodeJpeg(resizedBuffer));
+                    const resizedBuffer = await sharp(image).resize(28, 28).toBuffer();
+                    images.push(tf.node.decodeJpeg(resizedBuffer, 3));
+                    labels.push(1);
                 } catch (error) {
                     errors.dogs.push(dogFiles[i - 1]);
                 }
             }
+            // const y = tf.oneHot(labels, 2);
+            const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
 
-            const input = [...catTensors, ...dogTensors];
-            const output = [tf.tensor1d([1]), tf.tensor1d([0])];
-
-            await model.fit(input, output, {
-                epochs: 3,
-                batchSize: 10
-            });
+            await model.fit(tf.stack[images], ys, {
+                epochs: 2
+            })
         } catch (error) {
             console.log(error);
         }
