@@ -20,7 +20,7 @@ class AI {
 
         model.add(tf.layers.maxPooling2d({poolSize: [2, 2]}));
 
-        model.add(tf.layers.flatten());
+        model.add(tf.layers.flatten({}));
 
         model.add(tf.layers.dense({
             units: 2,
@@ -71,7 +71,7 @@ class AI {
             // const y = tf.oneHot(labels, 2);
             const ys = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
 
-            await model.fit(tf.stack[images], ys, {
+            await model.fit(tf.stack(images), ys, {
                 epochs: 2
             })
         } catch (error) {
