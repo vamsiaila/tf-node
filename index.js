@@ -66,7 +66,7 @@ class AI {
                     errors.push(imageFiles[i]);
                 }
             }
-            console.log(`we have error in following files ${errors}. Ignored`);
+            console.log(`we are unable to load ${errors.length} files. Ignored`);
             const size = images.length;
             const imagesShape = [size, 28, 28, 3];
             const allImages = new Float32Array(tf.util.sizeFromShape(imagesShape));

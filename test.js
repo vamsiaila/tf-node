@@ -8,7 +8,7 @@ const path = require('path');
 async function loadImage(imageName) {
     console.log('loading image');
     const imagesShape = [1, 28, 28, 3];
-    const image = await readFile(`${__dirname}/${imageName}.jpeg`);
+    const image = await readFile(`${__dirname}/${imageName}`);
     const imageBuffer = await sharp(image).resize(28, 28).toBuffer();
     const allImages = new Float32Array(tf.util.sizeFromShape(imagesShape));
     allImages.set(imageBuffer, 0);
