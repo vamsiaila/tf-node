@@ -11,9 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.6.1",
-    "canvas": "^2.7.0",
-    "image-js": "^0.31.4",
-    "jpeg-js": "^0.4.3",
     "sharp": "^0.28.2"
   }
 }
